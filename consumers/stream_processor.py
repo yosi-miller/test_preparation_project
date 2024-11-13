@@ -21,18 +21,21 @@ def check_transaction_fishing(transaction):
 
 
 for transaction in consumer:
-    print(transaction['transaction_id'])
+    transaction = transaction.value  # קבלת המידע כ-JSON
+
+    # בדיקת התוכן שהתקבל
+    print(f"Received Transaction ID: {transaction['transaction_id']}")
     # check_transaction_fishing(transaction)
 
     if transaction['is_fishing']:
-        producer.send('transaction-topic', value=transaction)
+        producer.send('black-transaction-topic', value=transaction)
         print('Transaction is fished!')
     else:
         if transaction['amount'] > 3000:
-            producer.send('transaction-topic', value=transaction)
+            producer.send('bad-transaction-topic', value=transaction)
             print('Transaction is above 3000')
         else:
-            producer.send('transaction-topic', value=transaction)
+            producer.send('good-transaction-topic', value=transaction)
             print('Transaction is ok!')
 
 producer.flush()
